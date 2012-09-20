@@ -1,16 +1,7 @@
-nginx
+# puppet-nginx
 
-This is the nginx module.
+This is a puppet module for managing nginx.
 
-License
--------
+## Usage
 
-
-Contact
--------
-
-
-Support
--------
-
-Please log tickets and issues at our [Projects site](http://projects.example.com)
+include nginx
