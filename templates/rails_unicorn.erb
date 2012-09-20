@@ -1,0 +1,46 @@
+upstream <%= proxy_name %> {
+  server   unix:<%= path %>/current/tmp/sockets/unicorn.sock;
+}
+server {
+  listen <%= listen %>;
+  server_name <%= server_name %>;
+  keepalive_timeout 5;
+  root <%= path %>/current/public;
+  access_log  on;
+  error_log on;
+
+  if ($request_method !~ ^(GET|HEAD|PUT|POST|DELETE|OPTIONS)$ ){
+    return 405;
+  }
+
+  location / {
+    try_files $uri/index.html $uri.html $uri @app;
+    error_page 404              /404.html;
+    error_page 422              /422.html;
+    error_page 500 502 503 504  /500.html;
+    error_page 403              /403.html;
+  }
+
+  location @app {
+    proxy_pass http://<%= proxy_name %>;
+    proxy_set_header Host $host;
+  }
+
+  location = /favicon.ico {
+    expires    max;
+    add_header Cache-Control public;
+  }
+
+# For rails3 asset pipeline
+  location ~ ^/assets/ {
+    expires 1y;
+    add_header Cache-Control public;
+
+    add_header ETag "";
+    break;
+  }
+
+  location ~ \.php$ {
+    deny  all;
+  }
+}
